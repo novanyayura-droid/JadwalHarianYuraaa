@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Harian Yuraa ✨</title>
+    
+    <!-- Google Fonts: Quicksand for a cute, rounded look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons for cute icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind Config to match the 'Soft Green' & 'Cute' aesthetic -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        tosca: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                        }
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'slide-up': 'slideUp 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0fdfa; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #5eead4; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2dd4bf; 
+        }
+
+        /* Hide time input icon for cleaner look on some browsers */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(50%) sepia(30%) saturate(700%) hue-rotate(70deg) brightness(90%) contrast(90%);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .task-enter {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-tosca-50 text-gray-700 min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+
+    <!-- Decorative background blobs -->
+    <div class="absolute top-[-10%] left-[-10%] w-64 h-64 bg-tosca-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-bounce-slow"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-72 h-72 bg-tosca-300 rounded-full mix-blend-multiply filter blur-2xl opacity-60 animate-bounce-slow" style="animation-delay: 1.5s;"></div>
+
+    <!-- Main App Container -->
+    <main class="w-full max-w-md glass-panel rounded-[2rem] shadow-xl shadow-tosca-200/50 overflow-hidden relative z-10 flex flex-col h-[90vh] max-h-[800px]">
+        
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-tosca-300 to-tosca-400 p-6 text-white text-center rounded-b-[2rem] shadow-md relative shrink-0">
+            <h1 class="text-2xl font-bold mb-1 flex items-center justify-center gap-2">
+                <i class="ph-fill ph-plant text-3xl"></i>
+                Halo, Yuraa! ✨
+            </h1>
+            <p id="greetingText" class="text-tosca-50 text-sm font-medium opacity-90">Semangat menjalani hari ini ya!</p>
+            
+            <!-- Date Display -->
+            <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold">
+                <span id="currentDate"></span>
+            </div>
+        </header>
+
+        <!-- Input Section -->
+        <section class="p-5 shrink-0">
+            <form id="taskForm" class="bg-white rounded-2xl p-4 shadow-sm border border-tosca-100 flex flex-col gap-3">
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <i class="ph ph-clock absolute left-3 top-1/2 transform -translate-y-1/2 text-tosca-400"></i>
+                        <input type="time" id="taskTime" required class="w-full bg-tosca-50 text-gray-700 text-sm rounded-xl py-2.5 pl-9 pr-3 focus:outline-none focus:ring-2 focus:ring-tosca-300 transition-all cursor-pointer">
+                    </div>
+                    <div class="relative w-2/3">
+                        <select id="taskCategory" class="w-full bg-tosca-50 text-gray-700 text-sm rounded-xl py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-tosca-300 transition-all appearance-none cursor-pointer">
+                            <option value="Rutinitas">📝 Rutinitas</option>
+                            <option value="Hobi">🎨 Hobi</option>
+                            <option value="Belajar">📚 Belajar</option>
+                            <option value="Santai">☕ Santai</option>
+                            <option value="Penting">⭐ Penting</option>
+                        </select>
+                        <i class="ph ph-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-tosca-400 pointer-events-none"></i>
+                    </div>
+                </div>
+                
+                <div class="relative flex gap-2">
+                    <input type="text" id="taskText" required placeholder="Yuraa mau ngapain nih?" autocomplete="off" class="w-full bg-tosca-50 text-gray-700 text-sm rounded-xl py-3 pl-4 pr-3 focus:outline-none focus:ring-2 focus:ring-tosca-300 transition-all placeholder-tosca-400/60">
+                    <button type="submit" class="bg-tosca-500 hover:bg-tosca-600 text-white rounded-xl w-12 flex items-center justify-center transition-colors shadow-md shadow-tosca-300/50 focus:scale-95 active:scale-90">
+                        <i class="ph-bold ph-plus text-lg"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Task List Section -->
+        <section class="flex-1 overflow-y-auto px-5 pb-5 custom-scrollbar">
+            <div id="taskList" class="flex flex-col gap-3">
+                <!-- Tasks will be injected here by JS -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-10 text-center animate-fade-in mt-10">
+                <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=yuraa&backgroundColor=transparent" alt="Cute Emoji" class="w-24 h-24 mb-4 opacity-80">
+                <h3 class="text-lg font-bold text-tosca-600">Jadwal masih kosong!</h3>
+                <p class="text-sm text-tosca-400 mt-1">Yuk tambahin aktivitas atau hobi seru Yuraa hari ini~</p>
+            </div>
+        </section>
+
+        <!-- Footer Stats -->
+        <footer class="bg-white/60 backdrop-blur-md p-4 border-t border-tosca-100 flex justify-between items-center text-xs font-semibold text-tosca-600 rounded-b-[2rem] shrink-0">
+            <div class="flex items-center gap-1.5">
+                <i class="ph-fill ph-check-circle text-tosca-500 text-base"></i>
+                <span id="completedCount">0</span> Selesai
+            </div>
+            <div class="flex items-center gap-1.5">
+                <i class="ph-fill ph-list-numbers text-tosca-500 text-base"></i>
+                <span id="totalCount">0</span> Total Kegiatan
+            </div>
+            <button onclick="clearAll()" class="text-red-400 hover:text-red-500 transition-colors flex items-center gap-1 bg-red-50 px-2 py-1 rounded-lg">
+                <i class="ph ph-trash"></i> Bersihkan
+            </button>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- State Management ---
+        let tasks = JSON.parse(localStorage.getItem('yuraa_schedule')) || [];
+
+        // DOM Elements
+        const taskForm = document.getElementById('taskForm');
+        const taskTime = document.getElementById('taskTime');
+        const taskText = document.getElementById('taskText');
+        const taskCategory = document.getElementById('taskCategory');
+        const taskList = document.getElementById('taskList');
+        const emptyState = document.getElementById('emptyState');
+        const completedCountEl = document.getElementById('completedCount');
+        const totalCountEl = document.getElementById('totalCount');
+        const currentDateEl = document.getElementById('currentDate');
+        const greetingText = document.getElementById('greetingText');
+
+        // Categories styling mapping
+        const categoryStyles = {
+            'Rutinitas': 'bg-blue-100 text-blue-600 border-blue-200',
+            'Hobi': 'bg-purple-100 text-purple-600 border-purple-200',
+            'Belajar': 'bg-orange-100 text-orange-600 border-orange-200',
+            'Santai': 'bg-teal-100 text-teal-600 border-teal-200',
+            'Penting': 'bg-red-100 text-red-600 border-red-200',
+        };
+
+        // --- Initialization ---
+        function init() {
+            setDateTimeInfo();
+            // Default time to current time
+            const now = new Date();
+            taskTime.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            renderTasks();
+            
+            // Update time info every minute
+            setInterval(setDateTimeInfo, 60000);
+        }
+
+        // --- Core Functions ---
+        function setDateTimeInfo() {
+            const now = new Date();
+            
+            // Set Date
+            const options = { weekday: 'short', day: 'numeric', month: 'short' };
+            currentDateEl.innerText = now.toLocaleDateString('id-ID', options);
+
+            // Set Greeting
+            const hour = now.getHours();
+            let greeting = "Semangat jalani hari!";
+            if (hour >= 5 && hour < 12) greeting = "Pagi yang cerah buat Yuraa! ☀️";
+            else if (hour >= 12 && hour < 15) greeting = "Siang Yuraa, jangan lupa istirahat & makan! 🍱";
+            else if (hour >= 15 && hour < 18) greeting = "Sore Yuraa, asyiknya ngelakuin hobi nih! 🎨";
+            else greeting = "Malam Yuraa, waktunya relax & me-time! 🌙";
+            
+            greetingText.innerText = greeting;
+        }
+
+        function saveTasks() {
+            localStorage.setItem('yuraa_schedule', JSON.stringify(tasks));
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            totalCountEl.innerText = total;
+            completedCountEl.innerText = completed;
+        }
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+
+                // Sort by time
+                tasks.sort((a, b) => a.time.localeCompare(b.time));
+
+                tasks.forEach(task => {
+                    const taskEl = document.createElement('div');
+                    taskEl.className = `task-enter flex items-center gap-3 p-3.5 bg-white rounded-2xl border ${task.completed ? 'border-tosca-200 bg-tosca-50/50' : 'border-gray-100 shadow-sm'} transition-all group`;
+                    
+                    const catStyle = categoryStyles[task.category] || categoryStyles['Rutinitas'];
+
+                    taskEl.innerHTML = `
+                        <!-- Checkbox -->
+                        <button onclick="toggleTask('${task.id}')" class="shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${task.completed ? 'bg-tosca-400 border-tosca-400 text-white' : 'border-gray-300 text-transparent hover:border-tosca-300'}">
+                            <i class="ph-bold ph-check text-xs"></i>
+                        </button>
+
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0 flex flex-col justify-center cursor-pointer" onclick="toggleTask('${task.id}')">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-xs font-bold text-tosca-600 bg-tosca-100 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                    <i class="ph ph-clock"></i> ${task.time}
+                                </span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${catStyle}">
+                                    ${task.category}
+                                </span>
+                            </div>
+                            <p class="text-sm font-semibold truncate transition-all ${task.completed ? 'text-gray-400 line-through' : 'text-gray-700'}">
+                                ${task.text}
+                            </p>
+                        </div>
+
+                        <!-- Delete Button -->
+                        <button onclick="deleteTask('${task.id}')" class="shrink-0 w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
+                            <i class="ph-fill ph-trash"></i>
+                        </button>
+                    `;
+                    taskList.appendChild(taskEl);
+                });
+            }
+            updateStats();
+        }
+
+        // --- Event Listeners ---
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const time = taskTime.value;
+            const text = taskText.value.trim();
+            const category = taskCategory.value;
+
+            if (!text || !time) return;
+
+            const newTask = {
+                id: Date.now().toString(),
+                time: time,
+                text: text,
+                category: category,
+                completed: false
+            };
+
+            tasks.push(newTask);
+            saveTasks();
+            renderTasks();
+            
+            // Reset text input but keep time and category for convenience
+            taskText.value = '';
+            taskText.focus();
+        });
+
+        // --- Global Methods for inline handlers ---
+        window.toggleTask = (id) => {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        };
+
+        window.deleteTask = (id) => {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+        };
+
+        window.clearAll = () => {
+            if (tasks.length === 0) return;
+            if (confirm('Yuraa yakin mau menghapus semua jadwal hari ini? 🥺')) {
+                tasks = [];
+                saveTasks();
+                renderTasks();
+            }
+        };
+
+        // Start App
+        init();
+
+    </script>
+</body>
+</html>
